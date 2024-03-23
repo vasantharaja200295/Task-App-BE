@@ -5,6 +5,12 @@
             "use":"@vercel/python"
         }
     ],
+    "crons":[
+        {
+            "path":"/api/cron/task-reminder",
+            "schedule":"*/5 * * * *"
+        }
+    ],
     "routes":[
         {
             "src":"/(.*)",

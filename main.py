@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import datetime
 from db_service import Service
 from statusCodes import status_codes
-from flask_mail import Mail
+from flask_mail import Mail, Message
 from email_service import email_service
 
 load_dotenv('.env')
@@ -34,6 +34,9 @@ def check_token_expiry():
     
     if request.path == '/api/register':
         return None 
+    
+    if request.path == '/api/cron/task-reminder':
+        return None
 
     auth_header = request.headers.get('Authorization')
     if auth_header and auth_header.startswith('Bearer'):
@@ -155,6 +158,37 @@ def index():
         return {"status":200, }
     except Exception as e:
         return {"status":401, "message":e}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Cron ----------------
+
+@app.route('/api/cron/task-reminder')
+def cron():
+    msg = Message( 
+    'Hello', 
+    sender ='str0m141v@gmail.com', 
+    recipients = ['vasantharaja200295@gmail.com'] 
+    ) 
+    msg.body = 'Hello Flask message sent from Flask-Mail' + str(datetime.datetime.now())
+    mail.send(msg) 
+    return "message-sent"
+
+# ---------------------
+
 
 
 if __name__ == '__main__':
