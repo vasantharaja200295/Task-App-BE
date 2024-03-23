@@ -8,7 +8,7 @@ load_dotenv('.env')
 
 class MongoDB:
     def __init__(self, db_name='test_database'):
-        self.client = MongoClient(f'mongodb+srv://{os.getenv('MONGOUSERNAME')}:{os.getenv('MONGOPASSWORD')}@cluster0.vpzkuqi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+        self.client = MongoClient(f"mongodb+srv://{os.getenv('MONGOUSERNAME')}:{os.getenv('MONGOPASSWORD')}@cluster0.vpzkuqi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
         self.db = self.client[db_name]
 
     def create_document(self, collection_name, document):
