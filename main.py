@@ -7,7 +7,7 @@ import datetime
 from db_service import Service
 from statusCodes import status_codes
 from flask_mail import Mail
-from email_service import gen_msg
+from email_service import email_service
 
 load_dotenv('.env')
 
@@ -24,6 +24,7 @@ mail = Mail(app)
 CORS(app)
 jwt = JWTManager(app)
 db_service = Service()
+email = email_service()
 
 
 @app.before_request
@@ -148,7 +149,7 @@ def index():
     req = request.get_json()
     status = req.get('status')
     data = req.get('data')
-    msg = gen_msg(status=status, data=data)
+    msg = email.gen_msg(status=status, data=data)
     try:
         mail.send(msg)
         return {"status":200, }
