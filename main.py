@@ -1,13 +1,14 @@
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, create_refresh_token
 from dotenv import load_dotenv
 import datetime
 from db_service import Service
 from statusCodes import status_codes
 from flask_mail import Mail, Message
 from email_service import email_service
+from utils import Utils
 
 load_dotenv('.env')
 
@@ -25,9 +26,11 @@ CORS(app)
 jwt = JWTManager(app)
 db_service = Service()
 email = email_service()
+utils = Utils()
 
 
 @app.before_request
+@jwt_required(optional=True)
 def check_token_expiry():
     if request.path == '/api/login':
         return None 
@@ -41,22 +44,31 @@ def check_token_expiry():
     auth_header = request.headers.get('Authorization')
     if auth_header and auth_header.startswith('Bearer'):
         token = auth_header.split()[1]
-        decoded_token = decode_token(token)
-        exp_time = datetime.datetime.fromtimestamp(decoded_token['exp']) 
-        current_time = datetime.datetime.now()  
-
-        if current_time > exp_time:
+        res = utils.verify_token(token=token)
+        if not res:
             return jsonify({"error": "Expired token"}), 401
 
 
 @app.route('/api/login', methods=['POST'])
 def login():
+    """
+    A function to handle user login. 
+    Retrieves username and password from request data, 
+    validates the user, generates an access token, 
+    and returns user data with the access token if login is successful.
+    
+    Parameters:
+    None
+    
+    Returns:
+    JSON response with user data and status code
+    """
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
     user_data = db_service.login_user(username, password)
     if user_data:
-        expires = datetime.timedelta(days=1)
+        expires = datetime.timedelta(days=3)
         access_token = create_access_token(identity=user_data.get('_id'), expires_delta=expires)
         user_data.pop('password')
         user_data['access_token'] = access_token
@@ -158,13 +170,6 @@ def index():
         return {"status":200, }
     except Exception as e:
         return {"status":401, "message":e}
-
-
-
-
-
-
-
 
 
 
