@@ -98,21 +98,47 @@ class Service:
         user = self.get_user(user_id)['data']
         query={'_id':ObjectId(user.get('_id'))}
         if user:
+            dept = data.get('dept')
+            role = data.get('role')
             updated_data = {
-                'dept':data.get('dept'),
-                'role':data.get('role'),
+                'dept':dept,
+                'role':role,
                 'onboading_flow_completed':True,
                 'reports_to':data.get('reports_to')
             }
             res = self.db.update_document('users', query, updated_data)
+            dept_doc = self.db.read_document('dept', {'_id':ObjectId(dept.get('_id'))})
+            if dept_doc:
+                if role == "hod":
+                    hod_list = dept_doc.get('hod')
+                    hod = {'_id': res.get('_id'),
+                        'display_name': res.get('display_name')}
+                    hod_list.append(hod)
+                    self.db.update_document('dept', {'_id':ObjectId(dept.get('_id'))}, {'hod': hod_list})
+                else:
+                    faculty_list = dept_doc.get('faculties')
+                    faculty = {
+                        '_id': res.get('_id'),
+                        'display_name': res.get('display_name')
+                    }
+                    faculty_list.append(faculty)
+                    self.db.update_document('dept', {'_id':ObjectId(dept.get('_id'))}, {'faculties': faculty_list})
             
             if res:
-                return {'status':200, 'data':res}
+                return {'status':200, 'data':"Onboarding completed"}
             else:
                 return {'status': 500, 'data':'Error failed to update'}
             
     def get_onboarding(self):
         depts = self.db.read_documents('dept')
+        for dept in depts:
+            dept_hods = dept.get('hod')
+            hods = []
+            for hod in dept_hods:
+                _id = ObjectId(hod.get('_id'))
+                hod = self.db.read_document('users', {'_id':_id})
+                hods.append({'display_name':hod.get('display_name'), '_id':hod.get('_id')})
+            dept['hod'] = hods
         return {'status':200, 'data': depts}
     
     def create_task(self, data):
