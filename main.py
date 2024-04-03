@@ -13,6 +13,7 @@ from utils import Utils
 load_dotenv('.env')
 
 app = Flask(__name__)
+env = os.getenv('ENV')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -24,7 +25,7 @@ app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
 mail = Mail(app)
 CORS(app)
 jwt = JWTManager(app)
-db_service = Service()
+db_service = Service(env)
 email = email_service()
 utils = Utils()
 
@@ -70,7 +71,7 @@ def login():
     if user_data:
         expires = datetime.timedelta(days=3)
         access_token = create_access_token(identity=user_data.get('_id'), expires_delta=expires)
-        user_data.pop('password')
+        user_data.clear()
         user_data['access_token'] = access_token
         return jsonify(user_data), 200
     return jsonify({"error": "Invalid username or password"}), 401

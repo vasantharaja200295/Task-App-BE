@@ -7,8 +7,12 @@ import os
 load_dotenv('.env')
 
 class MongoDB:
-    def __init__(self, db_name='test_database'):
-        self.client = MongoClient(f"mongodb+srv://{os.getenv('MONGOUSERNAME')}:{os.getenv('MONGOPASSWORD')}@cluster0.vpzkuqi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+    def __init__(self, db_name='test_database', env='dev'):
+        if env != 'dev':
+            connection_string = f"mongodb+srv://{os.getenv('MONGOUSERNAME')}:{os.getenv('MONGOPASSWORD')}@cluster0.vpzkuqi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" 
+        else:
+            connection_string = os.getenv('MONGO_CONNETION_DEV')
+        self.client = MongoClient(connection_string)
         self.db = self.client[db_name]
 
     def create_document(self, collection_name, document):
@@ -63,8 +67,9 @@ class Service:
 
     LOGIN_SUCCESS = 200
     LOGIN_FAILURE = 401
-    def __init__(self):
-        self.db = MongoDB('taskmanager')
+    def __init__(self, env):
+        print("connected to: ", env)
+        self.db = MongoDB('taskmanager', env=env)
     
     def login_user(self, username, password):
         return self.db.read_document('users', {'user_name': username, 'password': password})
