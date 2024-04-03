@@ -61,7 +61,7 @@ class MongoDB:
     
 class Service:
     REGISTER_SUCCESS = 200
-    REGISTER_USER_EXISTS = 400
+    REGISTER_USER_EXISTS = 409
     REGISTER_FAILURE = 500
     SUCCESS=200
 
@@ -72,10 +72,10 @@ class Service:
         self.db = MongoDB('taskmanager', env=env)
     
     def login_user(self, username, password):
-        return self.db.read_document('users', {'user_name': username, 'password': password})
+        return self.db.read_document('users', {'username': username, 'password': password})
     
     def register_user(self, data):
-        existing_user = self.db.read_document('users', {'user_name': data['user_name']})
+        existing_user = self.db.read_document('users', {'username': data['username']})
         if existing_user:
             return {"status":self.REGISTER_USER_EXISTS, 'message':'User Already Registered'}
         else:

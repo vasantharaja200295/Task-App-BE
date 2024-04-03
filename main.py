@@ -33,6 +33,9 @@ utils = Utils()
 @app.before_request
 @jwt_required(optional=True)
 def check_token_expiry():
+    """
+    Check if the token is expired before each request. If the request path is for login, register, or task reminder, return None. Otherwise, verify the token and return an error message if it's expired.
+    """
     if request.path == '/api/login':
         return None 
     
@@ -71,7 +74,7 @@ def login():
     if user_data:
         expires = datetime.timedelta(days=3)
         access_token = create_access_token(identity=user_data.get('_id'), expires_delta=expires)
-        user_data.clear()
+        user_data.pop('password')
         user_data['access_token'] = access_token
         return jsonify(user_data), 200
     return jsonify({"error": "Invalid username or password"}), 401
@@ -80,12 +83,13 @@ def login():
 def register():
     data = request.get_json()
     reg_data = {
-        'user_name': data.get('username'),
         'password': data.get('password'),
         'created_at': datetime.datetime.now(),
-        'display_name': data.get('display_name'),
+        'display_name': data.get('firstName')+ ' '+ data.get('lastName'),
         'email':data.get('email'),
     }
+    reg_data.update(data)
+    reg_data.pop('confirmPassword')
     res = db_service.register_user(reg_data)
     if status_codes.get(res['status']):
         return jsonify(res), res['status']
