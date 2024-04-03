@@ -113,7 +113,8 @@ class Service:
                     hod_list = dept_doc.get('hod')
                     hod = {'_id': res.get('_id'),
                         'display_name': res.get('display_name')}
-                    hod_list.append(hod)
+                    if hod not in hod_list:
+                        hod_list.append(hod)
                     self.db.update_document('dept', {'_id':ObjectId(dept.get('_id'))}, {'hod': hod_list})
                 else:
                     faculty_list = dept_doc.get('faculties')
@@ -121,7 +122,8 @@ class Service:
                         '_id': res.get('_id'),
                         'display_name': res.get('display_name')
                     }
-                    faculty_list.append(faculty)
+                    if faculty not in faculty_list:
+                        faculty_list.append(faculty)
                     self.db.update_document('dept', {'_id':ObjectId(dept.get('_id'))}, {'faculties': faculty_list})
             
             if res:
