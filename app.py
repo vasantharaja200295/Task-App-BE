@@ -6,7 +6,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from services import DBService
 from middleware import check_token_expiry
-from resources import Login, Register, GetUser, Onboarding
+from resources import Login, Register, GetUser, Onboarding, AddTask, GetTasks
 
 load_dotenv('.env')
 
@@ -29,6 +29,8 @@ api.add_resource(Login, '/api/login')
 api.add_resource(Register, '/api/register')
 api.add_resource(GetUser, '/api/get-user')
 api.add_resource(Onboarding, '/api/onboarding')
+api.add_resource(AddTask, '/api/tasks/add-task')
+api.add_resource(GetTasks, '/api/tasks/get-tasks')
 
 # middleware
 app.before_request(check_token_expiry)
