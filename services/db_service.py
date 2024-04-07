@@ -31,6 +31,18 @@ class DBService:
     def get_user(self, user_id):
         data = self.db.read_document('users', {'_id': ObjectId(user_id)})
         return {'status': HTTPStatus.OK, 'data': data}
+    
+    def get_users_list(self, dept_id):
+        data = self.db.read_documents('users', {'dept._id': dept_id})
+        for user in data:
+            user.pop('password', None) 
+            user.pop('role', None) 
+            user.pop('username', None) 
+            user.pop('firstName', None) 
+            user.pop('lastName', None) 
+            user.pop('onboading_flow_completed', None)
+
+        return data
 
     def set_onboading(self, user_id, data):
         user = self.get_user(user_id)['data']
