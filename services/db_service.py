@@ -9,8 +9,8 @@ class DBService:
         print("connected to: ", env)
         self.db = MongoDB('taskmanager', env=env)
 
-    def login_user(self, username, password):
-        return self.db.read_document('users', {'username': username, 'password': password})
+    def login_user(self, username):
+        return self.db.read_document('users', {'username': username})
 
     def register_user(self, data):
         existing_user = self.db.read_document(
@@ -44,7 +44,7 @@ class DBService:
 
         return data
 
-    def set_onboading(self, user_id, data):
+    def set_onboarding(self, user_id, data):
         user = self.get_user(user_id)['data']
         query = {'_id': ObjectId(user.get('_id'))}
         if user:
@@ -79,12 +79,13 @@ class DBService:
         for dept in depts:
             dept_hods = dept.get('hod')
             hods = []
-            for hod in dept_hods:
-                _id = ObjectId(hod.get('_id'))
-                hod = self.db.read_document('users', {'_id': _id})
-                hods.append({'display_name': hod.get(
-                    'display_name'), '_id': hod.get('_id')})
-            dept['hod'] = hods
+            if dept_hods:
+                for hod in dept_hods:
+                    _id = ObjectId(hod.get('_id'))
+                    hod = self.db.read_document('users', {'_id': _id})
+                    hods.append({'display_name': hod.get(
+                        'display_name'), '_id': hod.get('_id')})
+                dept['hod'] = hods
         return {'status': HTTPStatus.OK, 'data': depts}
 
     def create_task(self, data):
