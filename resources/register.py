@@ -17,7 +17,7 @@ class Register(Resource):
                         help="Confirm password cannot be blank.")
 
     def post(self):
-        from app import db_service
+        from main import db_service
         data = Register.parser.parse_args()
         hashed_password = hashpw(
             data.get('password').encode('utf-8'), gensalt())

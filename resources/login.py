@@ -13,7 +13,7 @@ class Login(Resource):
                         help="Password cannot be blank.")
 
     def post(self):
-        from app import db_service
+        from main import db_service
         data = self.parser.parse_args()
         username = data['username']
         password = data['password']

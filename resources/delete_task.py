@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required
 class DeleteTask(Resource):
     @jwt_required()
     def post(self):
-        from app import db_service
+        from main import db_service
         data = request.get_json()
         print(data)
         res = db_service.delete_task(data)

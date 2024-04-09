@@ -8,7 +8,7 @@ class UpdateTaskData(Resource):
 
     @jwt_required()
     def post(self):
-        from app import db_service
+        from main import db_service
         data = request.get_json()
         res = db_service.update_task_data(data.get('id'), data)
         if res:
