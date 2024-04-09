@@ -8,8 +8,7 @@ load_dotenv('.env')
 class MongoDB:
     def __init__(self, db_name='test_database', env='dev'):
         if env != 'dev':
-            connection_string = f"mongodb+srv://{os.getenv('MONGOUSERNAME')}:{os.getenv(
-                'MONGOPASSWORD')}@cluster0.vpzkuqi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+            connection_string = os.getenv('MONGO_CONNECTION_ONLINE')
         else:
             connection_string = os.getenv('MONGO_CONNETION_DEV')
         self.client = MongoClient(connection_string)
