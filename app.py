@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from services import DBService
 from middleware import check_token_expiry
 from resources import Login, Register, GetUser, Onboarding, AddTask
-from resources import GetTasks, UpdateStatus, UpdateTaskData, ListUsers
+from resources import GetTasks, UpdateStatus, UpdateTaskData, ListUsers, DeleteTask
 
 load_dotenv('.env')
 
@@ -34,6 +34,7 @@ api.add_resource(GetTasks, '/api/tasks/get-tasks')
 api.add_resource(UpdateStatus, '/api/tasks/update-status')
 api.add_resource(UpdateTaskData, '/api/tasks/update-task-data')
 api.add_resource(ListUsers, '/api/list-users')
+api.add_resource(DeleteTask, '/api/tasks/delete-task')
 
 # middleware
 app.before_request(check_token_expiry)

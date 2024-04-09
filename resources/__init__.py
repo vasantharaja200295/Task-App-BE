@@ -7,3 +7,4 @@ from .get_tasks import GetTasks
 from .update_status import UpdateStatus
 from .update_task_data import UpdateTaskData
 from .list_users import ListUsers
+from .delete_task import DeleteTask
