@@ -102,9 +102,13 @@ class DBService:
             'tasks', {'_id': ObjectId(task_id)}, new_data)
         return res
 
-    def get_tasks(self, is_admin, user_id):
+    def get_tasks(self, is_admin, user_id, dept_id):
         res = self.db.read_documents(
-            'tasks', {'created_by': user_id} if is_admin else {'assigned_to': user_id})
+            'tasks', {'dept._id': dept_id} if is_admin else {'assigned_to._id': user_id})
+        return res
+    
+    def delete_task(self, task_id):
+        res = self.db.delete_document('tasks', {'_id': ObjectId(task_id)})
         return res
 
     # ------- Utils Functions -------
