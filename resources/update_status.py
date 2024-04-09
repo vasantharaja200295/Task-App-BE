@@ -7,7 +7,7 @@ class UpdateStatus(Resource):
     def post(self):
         from app import db_service
         data = request.get_json()
-        res = db_service.update_task_status(data)
+        res = db_service.update_task_status(data.get('id'), data.get('status'))
         if res:
             return {"status": HTTPStatus.OK, "message": "Status Updated Successfully"}
         else:
