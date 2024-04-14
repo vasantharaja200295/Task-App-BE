@@ -7,22 +7,19 @@
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; padding: 20px;">
 
-<h2 style="color: #007bff;">Task Assigned: <strong>{{text}}</strong></h2>
+<h2 style="color: #007bff;">Task Assigned: <strong>{{data.get('task_name')}}</strong></h2>
 
-<p>Hi {{to}},</p>
+<p>Hi {{data.get('assigned_to')['display_name']}},</p>
 
 <p>I need to inform you about a task that has been assigned to you. Below are the details:</p>
 
-<p><strong>Task Title:</strong> {{text}}<br>
-<strong>Assigned By:</strong> {{from}}<br>
-<strong>Deadline:</strong>{{dueDate}}</p>
+<p><strong>Task Title:</strong> {{data.get('task_name')}}<br>
+<strong>Assigned By:</strong> {{data.get('created_by').get('display_name')}}<br>
+<strong>Deadline:</strong>{{data.get('due_date')}}</p>
 
 
 
 <p>Thank you for your attention to this matter.</p>
-
-<p>Best regards,<br>
-{{from}}</p>
-
+<p>Note: This is a system generated mail please dont reply</p>
 </body>
 </html>
