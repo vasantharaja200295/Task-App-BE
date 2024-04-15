@@ -91,6 +91,10 @@ class DBService:
     def create_task(self, data):
         res = self.db.create_document('tasks', data)
         return res
+    
+    def get_task_item( self, id):
+        res = self.db.read_document('tasks', {'_id': ObjectId(id)})
+        return res
 
     def update_task_status(self, task_id, status):
         res = self.db.update_document(

@@ -6,7 +6,8 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from services import DBService
 from middleware import check_token_expiry
-from resources import Login, Register, GetUser, Onboarding, AddTask
+from services import email_service
+from resources import Login, Register, GetUser, Onboarding, AddTask, SendEmail
 from resources import GetTasks, UpdateStatus, UpdateTaskData, ListUsers, DeleteTask
 
 load_dotenv('.env')
@@ -22,6 +23,9 @@ CORS(app)
 env = os.getenv('ENV')
 jwt = JWTManager(app)
 db_service = DBService(env)
+email = email_service()
+
+
 
 
 #  Resources
@@ -35,6 +39,7 @@ api.add_resource(UpdateStatus, '/api/tasks/update-status')
 api.add_resource(UpdateTaskData, '/api/tasks/update-task-data')
 api.add_resource(ListUsers, '/api/list-users')
 api.add_resource(DeleteTask, '/api/tasks/delete-task')
+api.add_resource(SendEmail, '/api/task-notify')
 
 # middleware
 app.before_request(check_token_expiry)
