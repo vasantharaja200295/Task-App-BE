@@ -29,5 +29,9 @@ TASK_STATUS = {
     "wont_fix":{
         "label":"Won't Fix",
         "value":"wont_fix"
+    },
+    "created":{
+        "label":"Created",
+        "value":"created"
     }
 }

@@ -7,9 +7,9 @@
 </head>
 <body>
 <div style="font-family: Arial, sans-serif; color: #333; background-color: #f4f4f4; padding: 20px; max-width: 600px; margin: auto;">
-    <h2 style="color: #4A90E2;">New Task Created</h2>
+    <h2 style="color: #4A90E2;">Task Updated</h2>
     <p>Hello <strong>{{ data['assigned_to']['display_name'] }}</strong>,</p>
-    <p>A new task has been assigned to you:</p>
+    <p>The following Task has been moved to {{ data['status'] }} status:</p>
     <table style="background-color: #fff; padding: 10px; border-collapse: collapse; width: 100%;">
         <tr>
             <th style="text-align: left; padding: 8px; background-color: #4A90E2; color: #fff;">Task Details</th>
@@ -24,12 +24,12 @@
             <td style="padding: 8px; border: 1px solid #ddd;">{{ data['description'] }}</td>
         </tr>
         <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Assigned To:</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ data['assigned_to']['display_name'] }}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">Due Date:</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ data['due_date'] }}</td>
         </tr>
         <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Due Date:</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ data['due_date']}}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">Status</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ data['status'] }}</td>
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd;">Created By:</td>
