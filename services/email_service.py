@@ -35,7 +35,6 @@ class email_service:
             server.quit()
 
     def gen_msg(self, status, data):
-        print(data)
         recievers = [data.get('created_by')['email'], data.get('assigned_to').get('email')]
         subject = f"Task {TASK_STATUS.get(status)['label']}: {data.get('task_name')}"
         if status == 'created':

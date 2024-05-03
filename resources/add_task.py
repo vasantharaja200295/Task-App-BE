@@ -10,7 +10,6 @@ class AddTask(Resource):
         data = request.get_json()
         res = db_service.create_task(data)
         task_data = db_service.get_task_item(res)
-        print("add Task : Res :", res)
         email.gen_msg(status="created", data=task_data)
         if res:
             return {"status": HTTPStatus.OK, "message": "Task Added Successfully"}
