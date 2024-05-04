@@ -1,8 +1,5 @@
 from flask import request, jsonify
-from flask_restful import abort
 from http import HTTPStatus
-from flask_jwt_extended import get_jwt_identity, jwt_required
-import datetime
 from utils import Utils
 
 utils = Utils()
