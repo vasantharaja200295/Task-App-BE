@@ -15,3 +15,5 @@ def check_token_expiry():
         res = utils.verify_token(token=token)
         if not res:
             return jsonify({"error": "Expired token"}), HTTPStatus.UNAUTHORIZED
+    else:
+        return jsonify({"error": "Invalid token"}), HTTPStatus.UNAUTHORIZED
