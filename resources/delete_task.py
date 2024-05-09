@@ -7,7 +7,6 @@ class DeleteTask(Resource):
     def post(self):
         from main import db_service
         data = request.get_json()
-        print(data)
         res = db_service.delete_task(data)
         if res:
             return {'status': HTTPStatus.OK, 'data': 'Task deleted successfully'}

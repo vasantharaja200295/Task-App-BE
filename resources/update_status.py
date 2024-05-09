@@ -7,7 +7,7 @@ class UpdateStatus(Resource):
     def post(self):
         from main import db_service, email
         data = request.get_json()
-        res = db_service.update_task_status(data.get('id'), data.get('status'))
+        res = db_service.update_task_status(data.get('id'), data.get('status'), data.get('completed_by'))
         # email.gen_msg(status=data.get('status'), data=res)
         if res:
             return {"status": HTTPStatus.OK, "message": "Status Updated Successfully"}

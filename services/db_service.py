@@ -1,7 +1,9 @@
 from bson import ObjectId
 from .mongo_db import MongoDB
 from http import HTTPStatus
+import datetime
 
+date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 class DBService:
 
@@ -28,20 +30,42 @@ class DBService:
             else:
                 return {"status": HTTPStatus.INTERNAL_SERVER_ERROR, "message": 'User Registration Failed'}
 
-    def get_user(self, user_id):
-        data = self.db.read_document('users', {'_id': ObjectId(user_id)})
-        return {'status': HTTPStatus.OK, 'data': data}
-    
-    def get_users_list(self, dept_id):
-        data = self.db.read_documents('users', {'dept._id': dept_id})
-        for user in data:
-            user.pop('password', None) 
-            user.pop('role', None) 
-            user.pop('username', None) 
-            user.pop('firstName', None) 
-            user.pop('lastName', None) 
-            user.pop('onboading_flow_completed', None)
+    def get_user(self, user_id, status=None):
+        if status == "completed":
+            projection = {
+                'password': 0,
+                'email': 0,
+                'role': 0,
+                'username': 0,
+                'firstName': 0,
+                'lastName': 0,
+                'onboading_flow_completed': 0,
+                'reports_to': 0,
+                'dept': 0,
+                "created_at":0
+            }
+        else:
+            projection = None
 
+        data = self.db.read_document(
+            'users', {'_id': ObjectId(user_id)}, projection)
+
+        if data:
+            return {'status': HTTPStatus.OK, 'data': data}
+        else:
+            return {'status': HTTPStatus.NOT_FOUND, 'message': 'User not found'}
+
+    def get_users_list(self, dept_id):
+        projection = {
+            'password': 0,
+            'role': 0,
+            'username': 0,
+            'firstName': 0,
+            'lastName': 0,
+            'onboading_flow_completed': 0
+        }
+        data = self.db.read_documents(
+            'users', {'dept._id': dept_id}, projection)
         return data
 
     def set_onboarding(self, user_id, data):
@@ -89,16 +113,28 @@ class DBService:
         return {'status': HTTPStatus.OK, 'data': depts}
 
     def create_task(self, data):
+        data['due_date'] = datetime.datetime.strptime(data['due_date'], date_format)
+        data['created_at'] = datetime.datetime.strptime(data['created_at'], date_format)
         res = self.db.create_document('tasks', data)
         return res
-    
-    def get_task_item( self, id):
+
+    def get_task_item(self, id):
         res = self.db.read_document('tasks', {'_id': ObjectId(id)})
         return res
 
-    def update_task_status(self, task_id, status):
-        res = self.db.update_document(
-            'tasks', {'_id': ObjectId(task_id)}, {'status': status})
+    def update_task_status(self, task_id, status, completed_by):
+        if status == "completed":
+            updated_data = {
+                'status': status,
+                'completed_on': datetime.datetime.now(),
+                'completed_by': self.get_user(completed_by, status="completed").get('data')
+            }
+            res = self.db.update_document(
+                'tasks', {'_id': ObjectId(task_id)}, updated_data)
+        else:
+            res = self.db.update_document(
+                'tasks', {'_id': ObjectId(task_id)}, {'status': status, 'completed_on': None,
+                                                      'completed_by': None})
         return res
 
     def update_task_data(self, task_id, new_data):
@@ -107,10 +143,57 @@ class DBService:
         return res
 
     def get_tasks(self, is_admin, user_id, dept_id):
+        projection = {'completed_on': 0}
         res = self.db.read_documents(
-            'tasks', {'dept._id': dept_id} if is_admin else {'assigned_to._id': user_id})
+            'tasks', {'dept._id': dept_id} if is_admin else {'assigned_to._id': user_id}, projection)
         return res
-    
+
+    def get_analytics_data(self, user_id):
+        analytics_data = {
+            'overall': {},
+            'monthly': {}
+        }
+        user_filter = {"assigned_to._id": user_id}
+
+        analytics_data['overall']['completed_count'] = self.db.count_documents(
+            'tasks', {"$and": [user_filter, {"status": "completed"}]})
+        analytics_data['overall']['inprogress_count'] = self.db.count_documents(
+            'tasks', {"$and": [user_filter, {"status": "in_progress"}]})
+        analytics_data['overall']['assigned'] = self.db.count_documents(
+            'tasks', {"$and": [user_filter, {"status": "assigned"}]})
+
+        analytics_data['monthly'] = []
+        current_month = datetime.datetime.now().month
+        current_year = datetime.datetime.now().year
+
+        for i in range(5):
+            month = current_month - i
+            year = current_year
+            if month < 1:
+                month = 12 + month
+                year -= 1
+
+            start_of_month = datetime.datetime(year, month, 1)
+            end_of_month = datetime.datetime(year, month + 1, 1)
+
+            monthly_data = {
+                'month': start_of_month.strftime("%B"),
+                'completed_count': self.db.count_documents('tasks', {
+                    "$and": [
+                        user_filter,
+                        {"status": "completed"},
+                        {"completed_on": {"$gte": start_of_month, "$lt": end_of_month}}
+                    ]
+                })
+            }
+            analytics_data['monthly'].append(monthly_data)
+
+        return analytics_data
+
+    def get_today_tasks(self, user_id):
+        user_filter = {"assigned_to._id": user_id}
+        return self.db.read_documents('tasks', {"$and": [user_filter, {"created_at": {"$gte": datetime.datetime.now()-datetime.timedelta(days=1)}}]})
+
     def delete_task(self, task_id):
         res = self.db.delete_document('tasks', {'_id': ObjectId(task_id)})
         return res

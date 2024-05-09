@@ -1,6 +1,7 @@
 from pymongo import MongoClient, ReturnDocument
 from dotenv import load_dotenv
 import os
+import datetime
 
 load_dotenv('.env')
 
@@ -19,14 +20,14 @@ class MongoDB:
         result = collection.insert_one(document)
         return str(result.inserted_id)
 
-    def read_documents(self, collection_name, query={}):
+    def read_documents(self, collection_name, query={}, projection=None):
         collection = self.db[collection_name]
-        documents = collection.find(query)
+        documents = collection.find(query, projection)
         return [self._serialize(doc) for doc in documents]
 
-    def read_document(self, collection_name, query):
+    def read_document(self, collection_name, query, projection=None):
         collection = self.db[collection_name]
-        document = collection.find_one(query)
+        document = collection.find_one(query, projection)
         return self._serialize(document)
 
     def update_documents(self, collection_name, query, new_values):
@@ -49,10 +50,18 @@ class MongoDB:
         collection = self.db[collection_name]
         result = collection.find_one_and_delete(query)
         return self._serialize(result)
+    
+    def count_documents(self, collection_name, query={}):
+        collection = self.db[collection_name]
+        return collection.count_documents(query)
 
     def _serialize(self, document):
         if document is None:
             return None
         if '_id' in document:
             document['_id'] = str(document['_id'])
+        for key, value in document.items():
+            if isinstance(value, datetime.datetime):
+                document[key] = value.isoformat()
+
         return document

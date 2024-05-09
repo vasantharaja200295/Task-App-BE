@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from services import DBService
 from middleware import check_token_expiry
 from services import email_service
-from resources import Login, Register, GetUser, Onboarding, AddTask, SendEmail
+from resources import Login, Register, GetUser, Onboarding, AddTask, SendEmail, Dashboard
 from resources import GetTasks, UpdateStatus, UpdateTaskData, ListUsers, DeleteTask
 
 load_dotenv('.env')
@@ -40,6 +40,7 @@ api.add_resource(UpdateTaskData, '/api/tasks/update-task-data')
 api.add_resource(ListUsers, '/api/list-users')
 api.add_resource(DeleteTask, '/api/tasks/delete-task')
 api.add_resource(SendEmail, '/api/task-notify')
+api.add_resource(Dashboard, '/api/dashboard')
 
 # middleware
 app.before_request(check_token_expiry)
